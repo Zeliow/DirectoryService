@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using System.Text.RegularExpressions;
+using DirectoryService.Domain.VO;
 using System.Xml.Linq;
 
 namespace DirectoryService.Domain;
@@ -11,7 +11,13 @@ public class Department
     private readonly List<Location> _location = [];
     private Department() { }
 
-    public Department(Name name, string identifier,Path path, Department? parent, short depth, IEnumerable<Location> location)
+    public Department(
+        Name name, 
+        Identifier identifier, 
+        PathDepartment path, 
+        Department? parent, 
+        short depth, 
+        IEnumerable<Location> location)
     {
         Id = Guid.NewGuid();
         Name = name;
@@ -26,9 +32,9 @@ public class Department
 
     public Guid Id { get; private set; }
     public Name Name { get; private set; }
-    public string Identifier { get; private set; }
+    public Identifier Identifier { get; private set; }
     public Department? Parent { get; private set; }
-    public Path Path { get; private set; }
+    public PathDepartment Path { get; private set; }
     public short Depth { get; private set;}
     public int ChildrenCount => ChildrenDepartments.Count;
     public bool IsActive { get; private set; }
@@ -41,8 +47,8 @@ public class Department
 
     public static Result<Department> Create(
         Name name, 
-        string identifier, 
-        Path path, 
+        Identifier identifier, 
+        PathDepartment path, 
         Department? parent, 
         short depth, 
         IEnumerable<Location> locations)
@@ -56,76 +62,4 @@ public class Department
         return Result.Success(department);
     }
 
-}
-
-public record Name
-{
-    public const int MIN_VALUE_LENGHT = 3;
-    public const int MAX_VALUE_LENGHT = 150;
-
-    public Name (string value)
-    {
-        Value = value;
-    }
-    public string Value { get; }
-
-    public static Result<Name> Crete(string value)
-    {
-
-        if (string.IsNullOrWhiteSpace(value) || (value.Length < MIN_VALUE_LENGHT || value.Length > MAX_VALUE_LENGHT))
-            return Result.Failure<Name>("not valid name");
-        return new Name(value);
-    }
-
-}
-
-public record Path
-{
-
-    public Path(string value)
-    {
-        Value = value;
-    }
-    public string Value { get; }
-
-    //public static Result<Path> Crete(string value)
-    //{
-
-    //    string newPath;
-    //    short newDepth;
-
-    //    // Выяснение родительского значения
-    //    if (parent is null)
-    //    {
-    //        newPath = identifier;
-    //        newDepth = 1;
-    //    }
-    //    else
-    //    {
-    //        var parentPath = parent?.Path;
-    //        newPath = parentPath + "." + identifier;
-    //        newDepth = (short)(parent.Depth + 1);
-    //    }
-    //}
-
-}
-
-public record Identifier
-{
-    public const int MIN_VALUE_LENGHT = 3;
-    public const int MAX_VALUE_LENGHT = 150;
-
-    public Identifier(string value)
-    {
-        Value = value;
-    }
-    public string Value { get; }
-
-    public static Result<Identifier> Crete(string value)
-    {
-
-        if (string.IsNullOrWhiteSpace(value) || (value.Length < MIN_VALUE_LENGHT || value.Length > MAX_VALUE_LENGHT) || !Regex.IsMatch(value, @"\P{IsCyrillic}"))
-            return Result.Failure<Identifier>("not valid ident");
-        return new Identifier(value);
-    }
 }

@@ -1,10 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
+using DirectoryService.Domain.VO;
 
 namespace DirectoryService.Domain;
 
 public class Position
 {
-    public Position(string name, Description description)
+    public Position(
+        string name, 
+        Description description)
     {
         Id = Guid.NewGuid();
         Name = name;
@@ -22,7 +25,9 @@ public class Position
     public DateTime UpdateAt { get; set; }
 
 
-    public static Result<Position> Create (string name, Description description)
+    public static Result<Position> Create (
+        string name,
+        Description description)
     {
         if (string.IsNullOrWhiteSpace(name) || (name.Length < 3 || name.Length > 100)) 
         {
@@ -31,25 +36,6 @@ public class Position
         var position = new Position(name, description);
 
         return Result.Success<Position>(position);
-    }
-}
-
-public record Description
-{
-    public const int MAX_VALUE_LENGHT = 100;
-    public Description(string value)
-    {
-        Value = value;
-    }
-    public string Value { get; }
-
-    public static Result<Description> Create(string value)
-    {
-        if (value.Length > MAX_VALUE_LENGHT)
-        {
-            return Result.Failure<Description>("too long description");
-        }
-        return new Description(value);
     }
 }
 
