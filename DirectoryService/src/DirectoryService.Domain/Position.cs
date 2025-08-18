@@ -1,14 +1,14 @@
-﻿namespace DirectoryService.Domain;
+﻿using CSharpFunctionalExtensions;
+
+namespace DirectoryService.Domain;
 
 public class Position
 {
-    public Position(string name, string description)
+    public Position(string name, Description description)
     {
         Id = Guid.NewGuid();
-        if (string.IsNullOrWhiteSpace(Name) || (name.Length < 3 || name.Length > 100)) throw new ArgumentException("");
-        else Name = name;
-        if (description.Length > 1000) throw new ArgumentException("");
-        else Description = description;
+        Name = name;
+        Description = description;
         IsActive = true;
         CreateAt = DateTime.UtcNow;
         UpdateAt = DateTime.UtcNow;
@@ -16,10 +16,40 @@ public class Position
     }
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public string? Description { get; set; }
+    public Description? Description { get; set; }
     public bool IsActive { get; set;}
     public DateTime CreateAt { get; set; }
     public DateTime UpdateAt { get; set; }
+
+
+    public static Result<Position> Create (string name, Description description)
+    {
+        if (string.IsNullOrWhiteSpace(name) || (name.Length < 3 || name.Length > 100)) 
+        {
+            return Result.Failure<Position>("Not valid Name");
+        }
+        var position = new Position(name, description);
+
+        return Result.Success<Position>(position);
+    }
 }
 
+public record Description
+{
+    public const int MAX_VALUE_LENGHT = 100;
+    public Description(string value)
+    {
+        Value = value;
+    }
+    public string Value { get; }
+
+    public static Result<Description> Create(string value)
+    {
+        if (value.Length > MAX_VALUE_LENGHT)
+        {
+            return Result.Failure<Description>("too long description");
+        }
+        return new Description(value);
+    }
+}
 
